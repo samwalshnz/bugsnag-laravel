@@ -1,6 +1,7 @@
 <?php namespace Bugsnag\BugsnagLaravel;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Exception\Handler;
 
 class BugsnagLaravelServiceProvider extends ServiceProvider
 {
@@ -14,21 +15,23 @@ class BugsnagLaravelServiceProvider extends ServiceProvider
     /**
      * Bootstrap the application events.
      *
+     * @param  Handler  $handler
+     *
      * @return void
      */
-    public function boot()
+    public function boot(Handler $handler)
     {
         $this->package('bugsnag/bugsnag-laravel', 'bugsnag');
 
         $app = $this->app;
 
         // Register for exception handling
-        $app->error(function (\Exception $exception) use ($app) {
+        $handle->error(function (\Exception $exception) use ($app) {
             $app['bugsnag']->notifyException($exception);
         });
 
         // Register for fatal error handling
-        $app->fatal(function ($exception) use ($app) {
+        $handle->fatal(function ($exception) use ($app) {
             $app['bugsnag']->notifyException($exception);
         });
     }
